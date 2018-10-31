@@ -7,12 +7,13 @@
         (else #f)))
 
 (define (miller-rabin-test n)
-  (define (try-it x)
-    (= (expmod x (- n 1) n) 1))
+  (define (try-it a)
+    (= (expmod a (- n 1) n) 1))
   (try-it (+ 1 (random (- n 1)))))
 
 (define (expmod base exp m)
-  (define (square-check x)
+  ; not equal to 1 or (- n 1), square is equal to 1 modulo n
+  (define (square-check x) 
     (if (and (not (or (= x 1) (= x (- m 1))))
              (= (remainder (square x) m) 1))
       0
