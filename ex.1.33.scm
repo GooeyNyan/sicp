@@ -33,4 +33,21 @@
 (define (sum-sqaure-primer a b)
   (filtered-accumulate prime? + 0 square (lambda (x) (+ x 1)) a b))
 
-(sum-sqaure-primer 2 10000)
+(define (gcd a b)
+  (if (= b 0)
+    a
+    (gcd b (remainder a b))))
+
+(define (sum-positive-integer n)
+  (filtered-accumulate 
+    (lambda (x) (= (gcd x n) 1))
+    +
+    0
+    (lambda (x) x)
+    (lambda (x) (+ x 1))
+    1
+    (- n 1)))
+
+(sum-sqaure-primer 2 1000)
+
+(sum-positive-integer 6)

@@ -14,21 +14,12 @@
 
 (define (average a b) (/ (+ a b) 2))
 
-(define (sqrt x)
-  (fixed-point 
-    (lambda (y) (average y (/ x y)))
-    1.0))
-
-(sqrt 9.0)
-
 (define dx 0.00001)
 
 (define (deriv g)
   (lambda (x) (/ (- (g (+ x dx)) (g x)) dx)))
 
 (define (cube x) (* x x x))
-
-((deriv cube) 5)
 
 (define (newton-transform g)
   (lambda (x) (- x (/ (g x) ((deriv g) x)))))
@@ -39,17 +30,13 @@
 (define (fixed-point-of-transform g transform guess)
   (fixed-point (transform g) guess))
 
-(define (sqrt x)
-  (newtons-method
-    (lambda (y) (- (square y) x)) 1.0))
-
 (define (average-dump f)
   (lambda (x) (average x (f x))))
 
-(define (sqrt x)
-  (fixed-point-of-transform
-    (lambda (y) (/ x y)) average-dump 1.0))
+(define (cubic a b c)
+  (lambda (x) (+ (cube x) (* a (square x)) (* b x) c)))
 
-(define (sqrt x)
-  (fixed-point-of-transform
-    (lambda (y) (- (square y) x)) newton-transform 1.0))
+(define (cubic-function a b c)
+  (newtons-method (cubic a b c) 1))
+
+(cubic-function 1 1 1)

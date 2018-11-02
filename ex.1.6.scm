@@ -6,8 +6,8 @@
         (else else-clause)))
 
 (define (sqrt-iter n guess)
-  ; (if (good-enough? n guess)
-  (new-if (good-enough? n guess)
+  (if (good-enough? n guess)
+  ; (new-if (good-enough? n guess)
     guess
     (sqrt-iter n (improve-it n guess))))
 
