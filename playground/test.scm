@@ -1,55 +1,63 @@
-(define tolerance 0.0000000001)
+(define (filter predicat sequence)
+  (if (null? sequence)
+    '()
+    (if (predicat (car sequence))
+      (cons (car sequence) (filter predicat (cdr sequence)))
+      (filter predicat (cdr sequence)))))
 
-(define (fixed-point f first-guess)
-  (define (close-enough? v1 v2)
-    (< (abs (- v1 v2)) tolerance))
-  (define (try guess)
-    (let ((next (f guess)))
-      (if (close-enough? guess next)
-        next
-        (try next))))
-  (try first-guess))
+(define (accumulate op initial sequence)
+  (if (null? sequence)
+    initial
+    (op (car sequence)
+        (accumulate op initial (cdr sequence)))))
 
-(fixed-point cos 1.0)
+(define (enumerate-interval a b)
+  (if (> a b)
+    '()
+    (append (list a) (enumerate-interval (+ a 1) b))))
 
-(define (average a b) (/ (+ a b) 2))
+(define (flatmap proc seq)
+  (accumulate append '() (map proc seq)))
 
-(define (sqrt x)
-  (fixed-point 
-    (lambda (y) (average y (/ x y)))
-    1.0))
+(define (prime? n)
+  (define (prime-iter a n)
+    (cond ((> a (sqrt n)) #t)
+          ((= (remainder n a) 0) #f)
+          (else (prime-iter (+ a 2) n))))
+  (cond ((= n 2) #t)
+        ((= (remainder n 2) 0) #f)
+        (else (prime-iter 3 n))))
 
-(sqrt 9.0)
+(define (prime-sum? pair)
+  (newline)
+  (display (prime? (+ (car pair) (cadr pair))))
+  (display (+ (car pair) (cadr pair)))
+  (prime? (+ (car pair) (cadr pair))))
 
-(define dx 0.00001)
+(define (make-pair-sum pair)
+  (list (car pair) (cadr pair) (+ (car pair) (cadr pair))))
 
-(define (deriv g)
-  (lambda (x) (/ (- (g (+ x dx)) (g x)) dx)))
 
-(define (cube x) (* x x x))
+(define (prime-sum-pairs n)
+  (map make-pair-sum
+       (filter prime-sum? (flatmap (lambda (i)
+                                     (map (lambda (j) (list i j))
+                                          (enumerate-interval 1 (- i 1))))
+                                   (enumerate-interval 1 n)))))
 
-((deriv cube) 5)
+(prime-sum-pairs 10)
 
-(define (newton-transform g)
-  (lambda (x) (- x (/ (g x) ((deriv g) x)))))
+(define (remove item sequence)
+  (filter (lambda (x) (not (= x item)))
+          sequence))
 
-(define (newtons-method g guess)
-  (fixed-point (newton-transform g) guess))
+; this strategy reduces the problem of generating permutations of S to the problem of generating the permutations of sets with fewer element than S.
+(define (permutations s)
+  (if (null? s)
+    (list '())
+    (flatmap (lambda (x)
+               (map (lambda (p) (cons x p))
+                    (permutations (remove x s))))
+             s)))
 
-(define (fixed-point-of-transform g transform guess)
-  (fixed-point (transform g) guess))
-
-(define (sqrt x)
-  (newtons-method
-    (lambda (y) (- (square y) x)) 1.0))
-
-(define (average-dump f)
-  (lambda (x) (average x (f x))))
-
-(define (sqrt x)
-  (fixed-point-of-transform
-    (lambda (y) (/ x y)) average-dump 1.0))
-
-(define (sqrt x)
-  (fixed-point-of-transform
-    (lambda (y) (- (square y) x)) newton-transform 1.0))
+(permutations (list 1 2 3))

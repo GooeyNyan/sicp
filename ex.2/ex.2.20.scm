@@ -1,0 +1,13 @@
+(define (same-parity . items)
+  (define (helper predicate items)
+    (if (null? items)
+      '()
+      (if (predicate (car items))
+        (cons (car items)
+              (helper predicate (cdr items)))
+        (helper predicate (cdr items)))))
+  (if (even? (car items))
+    (helper even? items)
+    (helper odd? items)))
+
+(same-parity 1 2 3 4 5)
