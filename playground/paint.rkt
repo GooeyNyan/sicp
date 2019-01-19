@@ -1,0 +1,17 @@
+#lang racket
+
+(require (planet "sicp.ss" ("soegaard" "sicp.plt" 2 0)))
+
+(define (square-of-four tl tr bl br)
+  (lambda (painter)
+    (let ((top (beside (tl painter) (tr painter)))
+          (bottom (beside (bl painter) (br painter))))
+      (below bottom top))))
+
+(define (flipped-pairs painter)
+  (let ((combine4 (square-of-four identity flip-vert
+                                  identity filp-vert)))
+    (combine4 painter)))
+
+(define (square-limit painter n)
+  (let ((combine4))))
